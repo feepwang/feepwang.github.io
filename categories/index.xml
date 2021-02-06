@@ -2,9 +2,9 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on feep!</title>
-    <link>http://feep.wang/categories/</link>
+    <link>https://feep.wang/categories/</link>
     <description>Recent content in Categories on feep!</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language><atom:link href="http://feep.wang/categories/index.xml" rel="self" type="application/rss+xml" />
+    <language>en-us</language><atom:link href="https://feep.wang/categories/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>
