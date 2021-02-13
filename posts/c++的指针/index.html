@@ -6,7 +6,7 @@
 	<meta property="og:image" content=""/>
 	<meta property="og:title" content="C&#43;&#43;的指针" />
 <meta property="og:description" content="C&#43;&#43;普通指针 下面记录几个常用的C&#43;&#43;普通指针的初始化：
-  int *ptr1; int i = 10; int *ptr2 = &amp;i;   int *ptr3 = new int; int *ptr4 = new int(100);   const、指针 const修饰符用来表示一个类型的常量。
+  int *ptr1; int i = 10; int *ptr2 = &amp;i;   int *ptr3 = new int; int *ptr4 = new int(100);   const与指针 const修饰符用来表示一个类型的常量。
  const的一般用法：  //	常量i const int const_i; //	常量引用 const int &amp;const_reference_i;  const与指针  //	常量指针（指向常量的指针） const int * ptr_to_const; //	指针常量 int *const const_ptr; //	指向常量的指针常量 const int *const const_ptr_to_const; 智能指针 C&#43;&#43;11引入了几类新的指针：shared_ptr、unique_ptr、weak_ptr。
   对比普通指针的new、delete命令，智能指针能自动管理内存空间的释放。
   智能指针可以看作一个系统内置的类模版。" />
@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="C&#43;&#43;的指针"/>
 <meta name="twitter:description" content="C&#43;&#43;普通指针 下面记录几个常用的C&#43;&#43;普通指针的初始化：
-  int *ptr1; int i = 10; int *ptr2 = &amp;i;   int *ptr3 = new int; int *ptr4 = new int(100);   const、指针 const修饰符用来表示一个类型的常量。
+  int *ptr1; int i = 10; int *ptr2 = &amp;i;   int *ptr3 = new int; int *ptr4 = new int(100);   const与指针 const修饰符用来表示一个类型的常量。
  const的一般用法：  //	常量i const int const_i; //	常量引用 const int &amp;const_reference_i;  const与指针  //	常量指针（指向常量的指针） const int * ptr_to_const; //	指针常量 int *const const_ptr; //	指向常量的指针常量 const int *const const_ptr_to_const; 智能指针 C&#43;&#43;11引入了几类新的指针：shared_ptr、unique_ptr、weak_ptr。
   对比普通指针的new、delete命令，智能指针能自动管理内存空间的释放。
   智能指针可以看作一个系统内置的类模版。"/>
@@ -62,7 +62,7 @@
 <span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>ptr4 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span>(<span style="color:#ae81ff">100</span>);
 </code></pre></div></li>
 </ol>
-<h2 id="const指针">const、指针</h2>
+<h2 id="const与指针">const与指针</h2>
 <p><code>const</code>修饰符用来表示一个类型的常量。</p>
 <ul>
 <li><code>const</code>的一般用法：</li>
@@ -90,7 +90,7 @@
 <p>智能指针可以看作一个系统内置的<strong>类模版</strong>。</p>
 </li>
 <li>
-<p>这个类模版里面存一个给定类型的指针，重载了<code>*</code>、<code>-&gt;</code>运算符以模拟指针的操作。</p>
+<p>智能指针里面存有一个给定类型的指针，重载了<code>*</code>、<code>-&gt;</code>运算符来模拟指针的操作。</p>
 </li>
 </ul>
 <h2 id="shared_ptr">shared_ptr</h2>
@@ -117,8 +117,20 @@ foo(ptr);		<span style="color:#75715e">//	错误
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>ptr <span style="color:#f92672">=</span> sptr.get();
 <span style="color:#75715e">//	错误：使用ptr手动释放内存空间，sptr的行为未定义。
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">delete</span> ptr;		<span style="color:#75715e">//	编译器检测通过
-</span></code></pre></div><p>我们能看到使用<code>get</code>函数是有风险的。所以原则上只能对指针指向的对象进行操作，不应该再把指针传递到当前作用域意外。</p>
-<p>另外，如果使用<code>get</code>到的指针初始化<code>shared_ptr</code>，新智能指针与旧智能指针是相互独立的，即使它们指向相同的对象；此时其中一个指针完成生命周期释放内存，另一个智能指针的行为是未定义的。所以，<strong>不能</strong>用<code>get</code>到的指针初始化新的<code>shared_ptr</code>。</p>
+</span></code></pre></div><p>我们能看到使用<code>get</code>函数是有风险的。</p>
+<p>所以原则上只能对指针指向的对象进行操作，<strong>不要</strong>把指针传递到当前作用域以外。</p>
+<p>另外，如果使用<code>get</code>到的指针初始化<code>shared_ptr</code>，新智能指针与旧智能指针是<strong>互相独立</strong>的，即使它们指向相同的对象；此时其中一个指针完成生命周期释放内存，另一个智能指针的行为是未定义的。所以，<strong>不能</strong>用<code>get</code>得到的指针初始化新的<code>shared_ptr</code>。</p>
+<h3 id="const与shared_ptr">const与shared_ptr</h3>
+<p>与普通指针相似，智能指针与const也有多种搭配使用的组合：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#75715e">//	指向常量的shared_ptr
+</span><span style="color:#75715e"></span>std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> sptr_to_const;
+<span style="color:#75715e">//	常量shared_ptr
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> const_sptr;
+<span style="color:#75715e">//	指向常量的常量shared_ptr
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">const</span> std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">const</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> const_ptr_to_const;
+</code></pre></div><blockquote>
+<p><a href="https://stackoverflow.com/questions/17793333/difference-between-const-shared-ptrt-and-shared-ptrconst-t" title="stackoverflow">Difference between <code>const shared_ptr</code> and <code>shared_ptr</code>?</a></p>
+</blockquote>
 
 		</section>
 
