@@ -98,7 +98,7 @@
 <p><code>shared_ptr</code>常用的初始化：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++">std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> sptr1 <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>make_shared<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span>();
 std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> sptr2(<span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span>);
-</code></pre></div><p>这里有一个值得注意的特性：<code>shared_ptr</code>不能使用<code>int</code>类型的普通指针进行赋值。</p>
+</code></pre></div><p>这里有一个值得注意的特性：<code>shared_ptr&lt;int&gt;</code>不能使用<code>int</code>类型的普通指针进行赋值。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++">std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> sptr3 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span>;
 <span style="color:#75715e">//	error:不存在从 &#34;int *&#34; 转换到 &#34;std::__1::shared_ptr&lt;int&gt;&#34; 的适当构造函数
 </span><span style="color:#75715e">//	没有定义普通指针到shared_ptr的隐式转换
