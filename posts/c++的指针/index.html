@@ -98,7 +98,28 @@
 <p><code>shared_ptr</code>常用的初始化：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++">std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> sptr1 <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>make_shared<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span>();
 std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> sptr2(<span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span>);
-</code></pre></div>
+</code></pre></div><p>这里有一个值得注意的特性：<code>shared_ptr</code>不能使用<code>int</code>类型的普通指针进行赋值。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++">std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> sptr3 <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span>;
+<span style="color:#75715e">//	error:不存在从 &#34;int *&#34; 转换到 &#34;std::__1::shared_ptr&lt;int&gt;&#34; 的适当构造函数
+</span><span style="color:#75715e">//	没有定义普通指针到shared_ptr的隐式转换
+</span></code></pre></div><p>先看下面一段错误示例：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">bool</span> <span style="color:#a6e22e">foo</span>(std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span>) {
+    <span style="color:#75715e">// function body
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> true;
+}
+
+<span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>ptr <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span>(<span style="color:#ae81ff">10</span>);
+foo(ptr);		<span style="color:#75715e">//	错误
+</span></code></pre></div><p><code>shared_ptr</code>也有取指针的成员函数<code>get</code>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++">std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> sptr(<span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span>(<span style="color:#ae81ff">19</span>));
+<span style="color:#75715e">//	get能取到sptr中的指针,该指针指向sptr管理的对象
+</span><span style="color:#75715e">//	注意：取得的指针不受sptr管理
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>ptr <span style="color:#f92672">=</span> sptr.get();
+<span style="color:#75715e">//	错误：使用ptr手动释放内存空间，sptr的行为未定义。
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">delete</span> ptr;		<span style="color:#75715e">//	编译器检测通过
+</span></code></pre></div><p>我们能看到使用<code>get</code>函数是有风险的。所以原则上只能对指针指向的对象进行操作，不应该再把指针传递到当前作用域意外。</p>
+<p>另外，如果使用<code>get</code>到的指针初始化<code>shared_ptr</code>，新智能指针与旧智能指针是相互独立的，即使它们指向相同的对象；此时其中一个指针完成生命周期释放内存，另一个智能指针的行为是未定义的。所以，<strong>不能</strong>用<code>get</code>到的指针初始化新的<code>shared_ptr</code>。</p>
+
 		</section>
 
 		<div class="post-tags">
