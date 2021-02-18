@@ -131,6 +131,56 @@ foo(ptr);		<span style="color:#75715e">//	错误
 </code></pre></div><blockquote>
 <p><a href="https://stackoverflow.com/questions/17793333/difference-between-const-shared-ptrt-and-shared-ptrconst-t" title="stackoverflow">Difference between <code>const shared_ptr</code> and <code>shared_ptr</code>?</a></p>
 </blockquote>
+<h3 id="shared_ptr的使用范围">shared_ptr的使用范围</h3>
+<p>可以看到shared_ptr与普通指针的使用方法最接近，所以我们可以在编写代码时<del>大量</del>使用shared_ptr来替代普通指针。</p>
+<p>这样做有一个显而易见的好处：<strong>避免普通指针跨定义域调用的各种问题</strong>。</p>
+<p>当然，使用shared_ptr仍然有一些需要注意的地方：</p>
+<ul>
+<li><strong>智能指针只能在调用动态内存的模块中使用</strong>。</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
+
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">foo</span>() {
+    <span style="color:#75715e">// warning：当sptr的生命周期结束，它会释放指向的内存空间
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// 在这个例子里，i会被释放
+</span><span style="color:#75715e"></span>    std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> sptr(<span style="color:#f92672">&amp;</span>i);
+}
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> i <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+    foo();
+  	<span style="color:#75715e">//	error:i已经被释放，结果未定义
+</span><span style="color:#75715e"></span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> i <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+}
+</code></pre></div><ul>
+<li>
+<p><strong>shared_ptr尽量避免与普通指针混合使用</strong></p>
+<p>已经提到，一个类型的普通指针与智能指针不存在隐式转换。即<code>int*</code> 的值不能直接赋给<code> shared_ptr&lt;int&gt;</code>;<code>shared_ptr&lt;int&gt;</code>也不能直接赋值给普通指针。</p>
+<p>混合使用可能会迷惑coder，进一步产生更多的安全问题。</p>
+<p>但我们也会遇到许多的遗留代码，使我们不得不既使用指针也使用智能指针。</p>
+<p>比如最常见的场景：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#75715e">//	std::shared_ptr&lt;int&gt; sptr;
+</span><span style="color:#75715e"></span>  
+<span style="color:#66d9ef">bool</span> <span style="color:#a6e22e">foo</span>( <span style="color:#75715e">//parameter list
+</span><span style="color:#75715e"></span>              <span style="color:#66d9ef">int</span><span style="color:#f92672">*</span>){
+      <span style="color:#75715e">//	function body
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">return</span> true;
+}
+  
+foo(sptr.get());	<span style="color:#75715e">//it works.
+</span></code></pre></div><p>但另一种场景就没有那么理想了：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#75715e">//	int* ptr;
+</span><span style="color:#75715e"></span>  
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">bar</span>(std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> sp){
+      <span style="color:#75715e">//	function body
+</span><span style="color:#75715e"></span>}
+  
+<span style="color:#75715e">//	error:构造的形参生命周期结束会销毁ptr指向的动态内存
+</span><span style="color:#75715e"></span>bar(<span style="color:#66d9ef">static_cast</span><span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;&gt;</span>(ptr));
+</code></pre></div></li>
+</ul>
+<hr>
+<h1 id="未完待续">未完待续</h1>
 
 		</section>
 
