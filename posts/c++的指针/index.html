@@ -136,23 +136,23 @@ foo(ptr);		<span style="color:#75715e">//	错误
 <p>这样做有一个显而易见的好处：<strong>避免普通指针跨定义域调用的各种问题</strong>。</p>
 <p>当然，使用shared_ptr仍然有一些需要注意的地方：</p>
 <ul>
-<li><strong>智能指针只能在调用动态内存的模块中使用</strong>。</li>
-</ul>
+<li>
+<p><strong>智能指针只能在调用动态内存的模块中使用</strong>。</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span>;
-
+  
 <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">foo</span>() {
     <span style="color:#75715e">// warning：当sptr的生命周期结束，它会释放指向的内存空间
 </span><span style="color:#75715e"></span>    <span style="color:#75715e">// 在这个例子里，i会被释放
 </span><span style="color:#75715e"></span>    std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> sptr(<span style="color:#f92672">&amp;</span>i);
 }
-
+  
 <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
     std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> i <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
     foo();
-  	<span style="color:#75715e">//	error:i已经被释放，结果未定义
+      <span style="color:#75715e">//	error:i已经被释放，结果未定义
 </span><span style="color:#75715e"></span>    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> i <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
 }
-</code></pre></div><ul>
+</code></pre></div></li>
 <li>
 <p><strong>shared_ptr尽量避免与普通指针混合使用</strong></p>
 <p>已经提到，一个类型的普通指针与智能指针不存在隐式转换。即<code>int*</code> 的值不能直接赋给<code> shared_ptr&lt;int&gt;</code>;<code>shared_ptr&lt;int&gt;</code>也不能直接赋值给普通指针。</p>
@@ -167,18 +167,27 @@ foo(ptr);		<span style="color:#75715e">//	错误
 </span><span style="color:#75715e"></span>      <span style="color:#66d9ef">return</span> true;
 }
   
-foo(sptr.get());	<span style="color:#75715e">//it works.
-</span></code></pre></div><p>但另一种场景就没有那么理想了：</p>
+<span style="color:#75715e">//	it works.but with security issue.
+</span><span style="color:#75715e"></span>foo(sptr.get());
+</code></pre></div><p>但如果把形参类型设置为<code>shared_ptr</code>：</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c++" data-lang="c++"><span style="color:#75715e">//	int* ptr;
 </span><span style="color:#75715e"></span>  
 <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">bar</span>(std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> sp){
       <span style="color:#75715e">//	function body
 </span><span style="color:#75715e"></span>}
   
-<span style="color:#75715e">//	error:构造的形参生命周期结束会销毁ptr指向的动态内存
+<span style="color:#75715e">//	error:构造的形参在生命周期结束时会销毁ptr指向的动态内存
 </span><span style="color:#75715e"></span>bar(<span style="color:#66d9ef">static_cast</span><span style="color:#f92672">&lt;</span>std<span style="color:#f92672">::</span>shared_ptr<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;&gt;</span>(ptr));
-</code></pre></div></li>
+</code></pre></div><pre><code>
+
+
+</code></pre></li>
 </ul>
+<hr>
+<p>references:</p>
+<ol>
+<li><a href="https://changkun.de/modern-cpp/zh-cn/05-pointers/index.html">Modern C++ Tutorial</a></li>
+</ol>
 <hr>
 <h1 id="未完待续">未完待续</h1>
 
